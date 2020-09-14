@@ -41,4 +41,15 @@ class JavaObjectTypeTest {
                 () -> 4);
         assertEquals(2, eval);
     }
+
+    @Test
+    void shouldThrowNpeOnNull() {
+        assertThrows(NullPointerException.class, () -> {
+            JavaObjectTypeExpression.eval(null,
+                    () -> 1,
+                    () -> 2,
+                    () -> 3,
+                    () -> 4);
+        });
+    }
 }

@@ -6,9 +6,11 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.ParameterizedTypeName
+import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import com.squareup.javapoet.TypeVariableName
 import java.nio.file.Paths
+import java.util.Objects
 import java.util.function.Supplier
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Modifier
@@ -42,7 +44,9 @@ class ExpressionWriter(val filer: Filer) {
     }
 
     private fun evaluatorCode(symbols: List<String>, enumType: ClassName): CodeBlock {
+        val objectsClassName = ClassName.get(Objects::class.java)
         return CodeBlock.builder()
+                .addStatement("\$T.requireNonNull(value)", objectsClassName)
                 .apply {
                     symbols.forEach {
                         beginControlFlow("if (\$T.$it.equals(value))", enumType)
