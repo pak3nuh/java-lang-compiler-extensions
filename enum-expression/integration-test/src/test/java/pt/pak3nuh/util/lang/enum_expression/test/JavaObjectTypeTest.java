@@ -2,7 +2,8 @@ package pt.pak3nuh.util.lang.enum_expression.test;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 class JavaObjectTypeTest {
@@ -51,5 +52,18 @@ class JavaObjectTypeTest {
                     () -> 3,
                     () -> 4);
         });
+    }
+
+    @Test
+    void shouldReturnDefaults() {
+        for (JavaObjectType value : JavaObjectType.values()) {
+            String result = JavaObjectTypeExpression.eval(value, new JavaObjectTypeExpression.WithDefault<String>() {
+                @Override
+                public String defaultValue() {
+                    return "Default";
+                }
+            });
+            assertEquals(result, "Default");
+        }
     }
 }

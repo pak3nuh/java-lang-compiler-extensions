@@ -20,17 +20,32 @@ class ExpressionWriter(val filer: Filer) {
         val type = TypeSpec.interfaceBuilder(className)
                 .addModifiers(Modifier.PUBLIC)
                 .addTypeVariable(variableName)
+                .addType(defaultInterface(enumData, variableName, className))
                 .addMethods(toInterfaceMethods(enumData, variableName))
-                .addMethod(evaluator(enumData, className))
+                .addMethod(evaluatorMethod(enumData, className))
                 .addMethod(lambdaExhaustive(enumData))
                 .build()
         val file = JavaFile.builder(enumData.pkg, type).build()
         file.writeTo(filer)
     }
 
-    private fun evaluator(enumData: EnumData, className: ClassName): MethodSpec {
+    private fun defaultInterface(enumData: EnumData, variableName: TypeVariableName, exprInterfaceName: ClassName): TypeSpec {
+        return TypeSpec.interfaceBuilder("WithDefault")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addSuperinterface(ParameterizedTypeName.get(exprInterfaceName, variableName))
+                .addTypeVariable(variableName)
+                .addMethod(
+                        MethodSpec.methodBuilder("defaultValue")
+                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                .returns(variableName).build()
+                )
+                .addMethods(toDefaultInterfaceMethods(enumData, variableName))
+                .build()
+    }
+
+    private fun evaluatorMethod(enumData: EnumData, exprInterfaceName: ClassName): MethodSpec {
         val variableName = TypeVariableName.get("W")
-        val expressionType = ParameterizedTypeName.get(className, variableName)
+        val expressionType = ParameterizedTypeName.get(exprInterfaceName, variableName)
         return MethodSpec.methodBuilder("eval")
                 .addTypeVariable(variableName)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -38,7 +53,7 @@ class ExpressionWriter(val filer: Filer) {
                 .addParameter(ParameterSpec.builder(expressionType, "delegate").build())
                 .addCode(evaluatorCode(enumData.symbols){ "delegate.$it()" })
                 .returns(variableName)
-                .build();
+                .build()
     }
 
     private fun evaluatorCode(symbols: List<String>, symbolFn: (String) -> String): CodeBlock {
@@ -59,6 +74,17 @@ class ExpressionWriter(val filer: Filer) {
         return enumData.symbols.map {
             MethodSpec.methodBuilder(it)
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .returns(variableName)
+                    .build()
+        }
+    }
+
+    private fun toDefaultInterfaceMethods(enumData: EnumData, variableName: TypeVariableName): Iterable<MethodSpec> {
+        return enumData.symbols.map {
+            MethodSpec.methodBuilder(it)
+                    .addAnnotation(Override::class.java)
+                    .addModifiers(Modifier.PUBLIC, Modifier.DEFAULT)
+                    .addCode("return defaultValue();")
                     .returns(variableName)
                     .build()
         }
