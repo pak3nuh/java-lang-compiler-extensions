@@ -30,6 +30,7 @@ subprojects {
     ifNotTestProject(this) {
         apply(plugin = "kotlin")
         apply(plugin = "maven-publish")
+        apply(plugin = "signing")
 
         java {
             withSourcesJar()
@@ -43,7 +44,9 @@ subprojects {
             }
         }
 
-        //todo signing
+        signing {
+            sign(publishing.publications["mavenJava"])
+        }
 
         tasks {
             compileKotlin {
