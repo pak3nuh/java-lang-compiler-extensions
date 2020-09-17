@@ -40,7 +40,25 @@ subprojects {
             publications {
                 create<MavenPublication>("mavenJava") {
                     from(components["java"])
+                    pom {
+                        description.set("Small annotation processor for language like extensions")
+                        developers {
+                            developer {
+                                id.set("pak3nuh")
+                                name.set("Nuno Caro")
+                                email.set("nuno.pik@gmail.com")
+                            }
+                        }
+                        scm {
+                            connection.set("scm:git@github.com:pak3nuh/java-lang-compiler-extensions.git")
+                            developerConnection.set("scm:git@github.com:pak3nuh/java-lang-compiler-extensions.git")
+                            url.set("https://github.com/pak3nuh/java-lang-compiler-extensions")
+                        }
+                    }
                 }
+            }
+            repositories {
+                mavenCentral()
             }
         }
 
