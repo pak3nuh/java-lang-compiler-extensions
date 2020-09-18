@@ -1,4 +1,4 @@
-group = "pt.pak3nuh.util.lang.compiler-extensions.enum-expression"
+group = "pt.pak3nuh.util.lang.compiler.enum-expression"
 
 dependencies {
     annotationProcessor(project(":enum-expression:processor"))

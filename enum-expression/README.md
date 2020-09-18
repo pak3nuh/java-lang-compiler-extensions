@@ -10,6 +10,14 @@ Since older language versions don't have this feature we can leverage code gener
 
 ## Usage
 
+Import the artifacts using your build tool:
+```kotlin
+dependencies {
+    implementation("pt.pak3nuh.util.lang.compiler.enum-expression:api:$enumExprVersion")
+    annotationProcessor("pt.pak3nuh.util.lang.compiler.enum-expression:processor:$enumExprVersion")
+}
+```
+
 Let's assume the following declaration
 ```java
 @Expression
@@ -28,6 +36,7 @@ interface TypeExpression<T> {
     static <W> W eval(Type value, TypeExpression<W> delegate) {
         // checks each branch and call correct method
     } 
+    ...
 }
 ``` 
 
