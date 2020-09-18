@@ -1,7 +1,6 @@
 package pt.pak3nuh.util.lang.enum_expression.processor
 
 import pt.pak3nuh.util.lang.enum_expression.Expression
-import java.lang.Exception
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Filer
 import javax.annotation.processing.ProcessingEnvironment
@@ -44,7 +43,7 @@ class EnumExpressionProcessor : AbstractProcessor() {
     }
 
     override fun getSupportedSourceVersion(): SourceVersion {
-        return SourceVersion.RELEASE_6
+        return SourceVersion.RELEASE_8 // default interface methods
     }
 
     override fun getSupportedAnnotationTypes(): Set<String> {
