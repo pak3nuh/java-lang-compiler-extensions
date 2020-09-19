@@ -50,8 +50,8 @@ subprojects {
                                 }
                             }
                             scm {
-                                connection.set("scm:git@github.com:pak3nuh/java-lang-compiler-extensions.git")
-                                developerConnection.set("scm:git@github.com:pak3nuh/java-lang-compiler-extensions.git")
+                                connection.set("scm:git:git://github.com/pak3nuh/java-lang-compiler-extensions.git")
+                                developerConnection.set("scm:git:ssh://github.com:pak3nuh/java-lang-compiler-extensions.git")
                                 url.set("https://github.com/pak3nuh/java-lang-compiler-extensions")
                             }
                             licenses {
