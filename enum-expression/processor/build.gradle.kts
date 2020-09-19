@@ -1,4 +1,5 @@
 group = "io.github.pak3nuh.util.lang.compiler.enum-expression"
+description = "Processor implementation"
 
 plugins {
     kotlin("jvm")

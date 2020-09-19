@@ -41,7 +41,9 @@ subprojects {
                     create<MavenPublication>("mavenJava") {
                         from(components["java"])
                         pom {
-                            description.set("Small annotation processor for language like extensions")
+                            name.set(this@afterEvaluate.name)
+                            description.set(this@afterEvaluate.description)
+                            url.set("https://github.com/pak3nuh/java-lang-compiler-extensions")
                             developers {
                                 developer {
                                     id.set("pak3nuh")
