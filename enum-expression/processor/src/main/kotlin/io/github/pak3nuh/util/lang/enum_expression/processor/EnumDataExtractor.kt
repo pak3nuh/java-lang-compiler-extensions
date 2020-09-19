@@ -1,4 +1,4 @@
-package pt.pak3nuh.util.lang.enum_expression.processor
+package io.github.pak3nuh.util.lang.enum_expression.processor
 
 import com.squareup.javapoet.ClassName
 import javax.lang.model.element.ElementKind

@@ -1,4 +1,4 @@
-package pt.pak3nuh.util.lang.enum_expression.test;
+package io.github.pak3nuh.util.lang.enum_expression.test;
 
 import org.junit.jupiter.api.Test;
 

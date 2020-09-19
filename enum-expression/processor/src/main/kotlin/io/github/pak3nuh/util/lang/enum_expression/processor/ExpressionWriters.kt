@@ -1,4 +1,4 @@
-package pt.pak3nuh.util.lang.enum_expression.processor
+package io.github.pak3nuh.util.lang.enum_expression.processor
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
@@ -8,7 +8,7 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeSpec
 import com.squareup.javapoet.TypeVariableName
-import java.util.*
+import java.util.Objects
 import java.util.function.Supplier
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Modifier

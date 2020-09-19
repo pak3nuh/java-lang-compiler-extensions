@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     version = "0.0.1"
-    group = "pt.pak3nuh.util.lang.compiler"
+    group = "io.github.pak3nuh.util.lang.compiler"
 
     repositories {
         jcenter()

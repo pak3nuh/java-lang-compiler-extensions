@@ -1,6 +1,6 @@
-package pt.pak3nuh.util.lang.enum_expression.processor
+package io.github.pak3nuh.util.lang.enum_expression.processor
 
-import pt.pak3nuh.util.lang.enum_expression.Expression
+import io.github.pak3nuh.util.lang.enum_expression.Expression
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Filer
 import javax.annotation.processing.ProcessingEnvironment

@@ -1,4 +1,4 @@
-package pt.pak3nuh.util.lang.enum_expression;
+package io.github.pak3nuh.util.lang.enum_expression;
 
 
 import java.lang.annotation.ElementType;

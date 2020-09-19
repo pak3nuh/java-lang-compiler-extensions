@@ -13,8 +13,8 @@ Since older language versions don't have this feature we can leverage code gener
 Import the artifacts using your build tool:
 ```kotlin
 dependencies {
-    implementation("pt.pak3nuh.util.lang.compiler.enum-expression:api:$enumExprVersion")
-    annotationProcessor("pt.pak3nuh.util.lang.compiler.enum-expression:processor:$enumExprVersion")
+    implementation("io.github.pak3nuh.util.lang.compiler.enum-expression:api:$enumExprVersion")
+    annotationProcessor("io.github.pak3nuh.util.lang.compiler.enum-expression:processor:$enumExprVersion")
 }
 ```
 
