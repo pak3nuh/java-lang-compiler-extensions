@@ -2,27 +2,19 @@ package io.github.pak3nuh.util.lang.enum_expression.processor
 
 import io.github.pak3nuh.util.lang.enum_expression.Expression
 import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Filer
-import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
+import javax.tools.Diagnostic
 
 class EnumExpressionProcessor : AbstractProcessor() {
-
-    lateinit var filer: Filer
-
-    override fun init(processingEnv: ProcessingEnvironment) {
-        super.init(processingEnv)
-        filer = processingEnv.filer
-    }
 
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
         if (annotations.isEmpty())
             return true
 
-        val writer = ExpressionWriter(filer)
+        val writer = ExpressionWriter(processingEnv.filer)
         val expressionAnnotation = annotations.first()
         return try {
             roundEnv.getElementsAnnotatedWith(expressionAnnotation)
@@ -38,7 +30,8 @@ class EnumExpressionProcessor : AbstractProcessor() {
             true
         } catch (ex: Exception) {
             ex.printStackTrace()
-            throw ex
+            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "Error processing annotations: ${ex.message}")
+            false
         }
     }
 
