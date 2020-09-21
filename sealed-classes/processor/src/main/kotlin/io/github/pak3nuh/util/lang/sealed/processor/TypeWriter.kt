@@ -4,6 +4,7 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
@@ -46,7 +47,7 @@ class TypeWriter(val filer: Filer) {
                             children.forEach { child ->
                                 val asTypeName = TypeName.get(child.asType())
                                 beginControlFlow("if (value instanceof \$T)", asTypeName)
-                                addStatement("return delegate.\$L()", child.simpleName.toString())
+                                addStatement("return delegate.\$L((\$T)value)", child.simpleName.toString(), TypeName.get(child.asType()))
                                 endControlFlow()
                             }
                             addStatement("throw new IllegalStateException(String.valueOf(value))")
@@ -61,6 +62,7 @@ class TypeWriter(val filer: Filer) {
             MethodSpec.methodBuilder(implName)
                     .returns(tVar)
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .addParameter(ParameterSpec.builder(TypeName.get(it.asType()), "value").build())
                     .build()
         }
     }

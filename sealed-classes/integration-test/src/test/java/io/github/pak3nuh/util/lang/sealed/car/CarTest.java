@@ -10,13 +10,13 @@ class CarTest {
     void shouldGenerateEvalCode() {
         final String eval = CarExpression.eval(new Nissan(), new CarExpression<String>() {
             @Override
-            public String Nissan() {
-                return "GTR";
+            public String Nissan(Nissan value) {
+                return value.model();
             }
 
             @Override
-            public String Fiat() {
-                return "Punto";
+            public String Fiat(Fiat value) {
+                return value.model();
             }
         });
         assertEquals("GTR", eval);
@@ -26,12 +26,12 @@ class CarTest {
     void shouldThrowNpe() {
         assertThrows(NullPointerException.class, () -> CarExpression.eval(null, new CarExpression<Object>() {
             @Override
-            public Object Nissan() {
+            public Object Nissan(Nissan value) {
                 return null;
             }
 
             @Override
-            public Object Fiat() {
+            public Object Fiat(Fiat value) {
                 return null;
             }
         }));
@@ -42,13 +42,13 @@ class CarTest {
         assertThrows(IllegalStateException.class, () -> CarExpression.eval(new Car() {
         }, new CarExpression<String>() {
             @Override
-            public String Nissan() {
-                return "GTR";
+            public String Nissan(Nissan value) {
+                return null;
             }
 
             @Override
-            public String Fiat() {
-                return "Punto";
+            public String Fiat(Fiat value) {
+                return null;
             }
         }));
     }

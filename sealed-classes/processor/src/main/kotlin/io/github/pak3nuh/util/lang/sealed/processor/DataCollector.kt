@@ -12,7 +12,7 @@ import javax.lang.model.util.Types
 
 class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
 
-    val sealedAnnotation = elementUtils.getTypeElement(SealedPackage::class.qualifiedName)
+    val sealedAnnotation = elementUtils.getTypeElement(SealedPackage::class.qualifiedName).asType()
 
     fun round(sealedTypes: Set<Element>, sealedPackages: Set<Element>): RoundData {
 
@@ -26,14 +26,17 @@ class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
                 .toList()
 
         val groupBySupertype: Map<TypeElement, List<Step1>> = list.groupBy(Step1::superType)
-        val sealedAsType = sealedAnnotation.asType()
-        val associateByPackageName: Map<String, Boolean> = sealedPackages
+        val hierarchies = groupBySupertype.map {
+            SealedHierarchy(it.key, it.value.map(Step1::type))
+        }
+
+        val sealedPackages = sealedPackages
                 .filterIsInstance<PackageElement>()
                 .associateBy { it.qualifiedName.toString() }
                 .mapValues { entry ->
                     elementUtils.getAllAnnotationMirrors(entry.value)
                             .filter {
-                                typeUtils.isSameType(it.annotationType, sealedAsType)
+                                typeUtils.isSameType(it.annotationType, sealedAnnotation)
                             }.map { mirror ->
                                 elementUtils.getElementValuesWithDefaults(mirror)
                                         .filterKeys { it.simpleName.contentEquals(SealedPackage::value.name) }
@@ -41,15 +44,9 @@ class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
                             }.map {
                                 it.value as Boolean
                             }.first()
-                }
+                }.mapTo(HashSet()) { Package(it.key, it.value) }
 
-        val hierarchies = groupBySupertype.map {
-            val supertypeName = it.key.qualifiedName.toString()
-            val packageName = supertypeName.substring(0, supertypeName.lastIndexOf('.'))
-
-            SealedHierarchy(it.key, it.value.map(Step1::type), associateByPackageName.getOrDefault(packageName, true))
-        }
-        return RoundData(hierarchies)
+        return RoundData(hierarchies, sealedPackages)
     }
 
     private inner class Step1(val superType: TypeElement, val type: TypeElement) {
@@ -80,5 +77,6 @@ class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
 
 }
 
-data class SealedHierarchy(val rootType: TypeElement, val children: List<TypeElement>, val sealedPackage: Boolean)
-data class RoundData(val hierarchies: List<SealedHierarchy>)
+data class SealedHierarchy(val rootType: TypeElement, val children: List<TypeElement>)
+data class Package(val packageName: String, val sealed: Boolean)
+data class RoundData(val hierarchies: List<SealedHierarchy>, val packages: Set<Package>)
