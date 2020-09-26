@@ -12,9 +12,9 @@ import javax.lang.model.util.Types
 
 class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
 
-    val sealedAnnotation = elementUtils.getTypeElement(SealedPackage::class.qualifiedName).asType()
+    private val sealedAnnotation = elementUtils.getTypeElement(SealedPackage::class.qualifiedName).asType()
 
-    fun round(sealedTypes: Set<Element>, sealedPackages: Set<Element>): RoundData {
+    fun round(sealedTypes: Set<Element>, sealedPackageElements: Set<Element>): RoundData {
 
         val list = sealedTypes.asSequence()
                 .filterIsInstance(TypeElement::class.java)
@@ -30,7 +30,7 @@ class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
             SealedHierarchy(it.key, it.value.map(Step1::type))
         }
 
-        val sealedPackages = sealedPackages
+        val sealedPackages = sealedPackageElements
                 .filterIsInstance<PackageElement>()
                 .associateBy { it.qualifiedName.toString() }
                 .mapValues { entry ->
@@ -51,6 +51,11 @@ class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
 
     private inner class Step1(val superType: TypeElement, val type: TypeElement) {
         fun validate() {
+            val typeModifiers = type.modifiers
+            check(typeModifiers.contains(Modifier.FINAL) || typeModifiers.contains(Modifier.ABSTRACT)) {
+                "Element $type must be a final or abstract class"
+            }
+
             val isSupertypeClass = superType.kind == ElementKind.CLASS
             val isSupertypeAbstract = superType.modifiers.contains(Modifier.ABSTRACT)
             check(isSupertypeClass && isSupertypeAbstract) {

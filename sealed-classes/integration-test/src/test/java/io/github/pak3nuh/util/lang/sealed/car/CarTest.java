@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CarTest {
     @Test
@@ -17,6 +18,11 @@ class CarTest {
             @Override
             public String Fiat(Fiat value) {
                 return value.model();
+            }
+
+            @Override
+            public String Bmw(Bmw value) {
+                return "BMW";
             }
         });
         assertEquals("GTR", eval);
@@ -32,6 +38,11 @@ class CarTest {
 
             @Override
             public Object Fiat(Fiat value) {
+                return null;
+            }
+
+            @Override
+            public Object Bmw(Bmw value) {
                 return null;
             }
         }));
@@ -50,6 +61,42 @@ class CarTest {
             public String Fiat(Fiat value) {
                 return null;
             }
+
+            @Override
+            public String Bmw(Bmw value) {
+                return null;
+            }
         }));
+    }
+
+    @Test
+    void shouldNestSealedHierarchies() {
+        final Boolean result = CarExpression.eval(new BmwI8(), new CarExpression<Boolean>() {
+            @Override
+            public Boolean Nissan(Nissan value) {
+                return false;
+            }
+
+            @Override
+            public Boolean Fiat(Fiat value) {
+                return false;
+            }
+
+            @Override
+            public Boolean Bmw(Bmw value) {
+                return BmwExpression.eval(value, new BmwExpression<Boolean>() {
+                    @Override
+                    public Boolean BmwI8(BmwI8 value) {
+                        return true;
+                    }
+
+                    @Override
+                    public Boolean BmwM3(BmwM3 value) {
+                        return false;
+                    }
+                });
+            }
+        });
+        assertTrue(result);
     }
 }
