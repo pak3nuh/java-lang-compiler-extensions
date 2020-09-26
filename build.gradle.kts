@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-    version = "0.0.1"
+    version = "0.0.2"
     group = "io.github.pak3nuh.util.lang.compiler"
 
     repositories {
