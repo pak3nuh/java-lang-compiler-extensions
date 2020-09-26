@@ -13,11 +13,13 @@ class SealedClassProcessor: AbstractProcessor() {
 
     lateinit var dataCollector: DataCollector
     lateinit var typeWriter: TypeWriter
+    lateinit var manifestModifier: ManifestModifier
 
     override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
         dataCollector = DataCollector(processingEnv.elementUtils, processingEnv.typeUtils)
         typeWriter = TypeWriter(processingEnv.filer)
+        manifestModifier = ManifestModifier(processingEnv.filer)
     }
 
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
@@ -29,6 +31,7 @@ class SealedClassProcessor: AbstractProcessor() {
                     roundEnv.getElementsAnnotatedWith(SealedType::class.java),
                     roundEnv.getElementsAnnotatedWith(SealedPackage::class.java)
             )
+            manifestModifier.sealPackages(roundData)
             typeWriter.write(roundData)
             true
         } catch (ex: Exception) {
