@@ -10,13 +10,15 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
-class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
+private typealias SealedPackages = Map<String, Boolean>
+
+class DataCollector(private val elementUtils: Elements, private val typeUtils: Types) {
 
     private val sealedAnnotation = elementUtils.getTypeElement(SealedPackage::class.qualifiedName).asType()
 
-    fun round(sealedTypes: Set<Element>, sealedPackageElements: Set<Element>): RoundData {
+    fun round(sealedTypes: Set<Element>, annotatedSealedPackageElements: Set<Element>): RoundData {
 
-        val list = sealedTypes.asSequence()
+        val validHierarchies = sealedTypes.asSequence()
                 .filterIsInstance(TypeElement::class.java)
                 .onEach {
                     check(it.kind == ElementKind.CLASS) { "SealedType can only be applied to classes." }
@@ -25,12 +27,26 @@ class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
                 }.onEach(Step1::validate)
                 .toList()
 
-        val groupBySupertype: Map<TypeElement, List<Step1>> = list.groupBy(Step1::superType)
+        val groupBySupertype: Map<TypeElement, List<Step1>> = validHierarchies.groupBy(Step1::superType)
         val hierarchies = groupBySupertype.map {
             SealedHierarchy(it.key, it.value.map(Step1::type))
         }
 
-        val sealedPackages = sealedPackageElements
+        val sealedPackages = getImplicitSealedPackages(groupBySupertype.keys)
+                .plus(getSealedPackageAnnotationValue(annotatedSealedPackageElements)) // overrides existing
+                .mapTo(HashSet()){ Package(it.key, it.value) }
+
+        return RoundData(hierarchies, sealedPackages)
+    }
+
+    private fun getImplicitSealedPackages(keys: Set<TypeElement>): SealedPackages {
+        return keys.map {
+            elementUtils.getPackageOf(it).qualifiedName.toString() to true
+        }.toMap()
+    }
+
+    private fun getSealedPackageAnnotationValue(annotatedSealedPackageElements: Set<Element>): SealedPackages {
+        return annotatedSealedPackageElements
                 .filterIsInstance<PackageElement>()
                 .associateBy { it.qualifiedName.toString() }
                 .mapValues { entry ->
@@ -44,9 +60,7 @@ class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
                             }.map {
                                 it.value as Boolean
                             }.first()
-                }.mapTo(HashSet()) { Package(it.key, it.value) }
-
-        return RoundData(hierarchies, sealedPackages)
+                }
     }
 
     private inner class Step1(val superType: TypeElement, val type: TypeElement) {
@@ -69,7 +83,7 @@ class DataCollector(val elementUtils: Elements, val typeUtils: Types) {
                     .filterIsInstance<ExecutableElement>()
                     .filter { it.kind == ElementKind.CONSTRUCTOR }
                     .toList()
-            check(constructors.isNotEmpty()) { "Type $superType must declare all constructors" }
+            check(constructors.isNotEmpty()) { "Type $superType can't have default constructors" }
 
             val invalidConstructors = constructors
                     .flatMap { const -> const.modifiers }
