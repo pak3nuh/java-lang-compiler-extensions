@@ -1,7 +1,9 @@
 package io.github.pak3nuh.util.lang.enum_expression.processor
 
 import io.github.pak3nuh.util.lang.enum_expression.Expression
+import io.github.pak3nuh.util.processor.ElementAnalyzer
 import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
@@ -9,6 +11,13 @@ import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 
 class EnumExpressionProcessor : AbstractProcessor() {
+
+    lateinit var extractor: EnumDataExtractor
+
+    override fun init(processingEnv: ProcessingEnvironment) {
+        super.init(processingEnv)
+        extractor = EnumDataExtractor(ElementAnalyzer(processingEnv.elementUtils, processingEnv.typeUtils))
+    }
 
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
         if (annotations.isEmpty())
@@ -25,7 +34,7 @@ class EnumExpressionProcessor : AbstractProcessor() {
                             "Can't create expressions on element ${it.qualifiedName}"
                         }
                     }
-                    .map { extractData(it) }
+                    .map { extractor.extractData(it) }
                     .forEach { writer.write(it) }
             true
         } catch (ex: Exception) {

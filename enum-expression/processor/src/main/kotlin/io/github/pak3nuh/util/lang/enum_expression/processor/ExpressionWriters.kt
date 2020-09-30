@@ -15,14 +15,14 @@ import javax.lang.model.element.Modifier
 
 class ExpressionWriter(val filer: Filer) {
     fun write(enumData: EnumData) {
-        val className: ClassName = ClassName.bestGuess("${enumData.pkg}.${enumData.name}Expression")
+        val exprInterfaceName: ClassName = ClassName.bestGuess("${enumData.pkg}.${enumData.expressionName}")
         val variableName: TypeVariableName = TypeVariableName.get("T")
-        val type = TypeSpec.interfaceBuilder(className)
+        val type = TypeSpec.interfaceBuilder(exprInterfaceName)
                 .addModifiers(Modifier.PUBLIC)
                 .addTypeVariable(variableName)
-                .addType(defaultInterface(enumData, variableName, className))
+                .addType(defaultInterface(enumData, variableName, exprInterfaceName))
                 .addMethods(toInterfaceMethods(enumData, variableName))
-                .addMethod(evaluatorMethod(enumData, className))
+                .addMethod(evaluatorMethod(enumData, exprInterfaceName))
                 .addMethod(lambdaExhaustive(enumData))
                 .build()
         val file = JavaFile.builder(enumData.pkg, type).build()
