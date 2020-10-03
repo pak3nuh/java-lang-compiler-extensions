@@ -1,5 +1,6 @@
 
 rootProject.name = "java-lang-compiler-extensions"
+include("gen-util")
 include("enum-expression")
 include("enum-expression:api")
 include("enum-expression:processor")

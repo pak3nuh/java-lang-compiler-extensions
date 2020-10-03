@@ -12,4 +12,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface Expression {
+    /**
+     * An alternative name for the expression interface.
+     * <p>By default, the interface will have the same name as the enum with the <b>Expression</b> appended.</p>
+     */
+    String value() default "";
 }

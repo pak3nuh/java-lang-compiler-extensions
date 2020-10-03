@@ -66,6 +66,16 @@ of integrity on the generated code.
 These integrity checks, along with package sealing, ensure that the entire inheritance chain
 is known in a single compilation step, not being possible to extend it further.
 
+## Usage
+
+Import the artifacts using your build tool:
+```kotlin
+dependencies {
+    implementation("io.github.pak3nuh.util.lang.compiler.sealed:api:$version")
+    annotationProcessor("io.github.pak3nuh.util.lang.compiler.sealed:processor:$version")
+}
+```
+
 ## Sealed Packages
 By default, all packages are open, but we can seal them in the jar 
 [manifest](https://docs.oracle.com/javase/7/docs/technotes/guides/jar/jar.html#Manifest_Specification).
