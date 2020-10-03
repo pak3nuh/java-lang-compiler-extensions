@@ -1,6 +1,8 @@
-group = "io.github.pak3nuh.util.processor"
+group = Projects.baseGroupId
 description = "Generator util"
 
 plugins {
     kotlin("jvm")
+    `maven-publish`
+    signing
 }

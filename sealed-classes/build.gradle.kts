@@ -1,4 +1,5 @@
 subprojects {
+    group = "${Projects.baseGroupId}.sealed"
     apply(plugin = "java-library")
 
     if (!name.endsWith("-test")) {

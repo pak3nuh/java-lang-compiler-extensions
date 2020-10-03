@@ -6,8 +6,8 @@ plugins {
 }
 
 allprojects {
-    version = "0.0.2"
-    group = "io.github.pak3nuh.util.lang.compiler"
+    version = "0.1.0"
+    group = Projects.baseGroupId
 
     repositories {
         jcenter()

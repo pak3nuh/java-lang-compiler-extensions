@@ -1,4 +1,3 @@
-group = "io.github.pak3nuh.util.lang.compiler.sealed"
 description = "Processor implementation"
 
 plugins {
