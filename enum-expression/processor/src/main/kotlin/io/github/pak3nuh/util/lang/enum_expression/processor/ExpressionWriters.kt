@@ -8,7 +8,7 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeSpec
 import com.squareup.javapoet.TypeVariableName
-import java.util.Objects
+import java.util.*
 import java.util.function.Supplier
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Modifier
@@ -92,7 +92,7 @@ class ExpressionWriter(val filer: Filer) {
 
     private fun lambdaExhaustive(enumData: EnumData): MethodSpec {
         val variableName = TypeVariableName.get("W")
-        return MethodSpec.methodBuilder("eval")
+        return MethodSpec.methodBuilder("evalLambda")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariable(variableName)
                 .addParameters(toParameters(enumData.symbols, variableName, enumData.enumType))
