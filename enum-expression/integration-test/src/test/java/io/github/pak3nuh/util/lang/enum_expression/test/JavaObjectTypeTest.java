@@ -35,7 +35,7 @@ class JavaObjectTypeTest {
 
     @Test
     public void shouldGenerateVisitorLambda() {
-        final Integer eval = JavaObjectTypeExpression.eval(JavaObjectType.JAVA_2,
+        final Integer eval = JavaObjectTypeExpression.evalLambda(JavaObjectType.JAVA_2,
                 () -> 1,
                 () -> 2,
                 () -> 3,
@@ -46,7 +46,7 @@ class JavaObjectTypeTest {
     @Test
     void shouldThrowNpeOnNull() {
         assertThrows(NullPointerException.class, () -> {
-            JavaObjectTypeExpression.eval(null,
+            JavaObjectTypeExpression.evalLambda(null,
                     () -> 1,
                     () -> 2,
                     () -> 3,
