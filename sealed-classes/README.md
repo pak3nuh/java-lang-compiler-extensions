@@ -27,7 +27,11 @@ interface PersonExpression<T> {
     T Student(Student value);
 
     static <Y> Y eval(Person input, PersonExpression<Y> delegate) {
-        // evaluates the input and returns the correct delegate branch 
+        // evaluates the input and invokes the correct delegate branch 
+    }
+    
+    static <Y> Y evalLambda(Person input, Function<Worker, Y> worker, ...) {
+        // evaluates the input and invokes the correct function
     }
 }
 ```

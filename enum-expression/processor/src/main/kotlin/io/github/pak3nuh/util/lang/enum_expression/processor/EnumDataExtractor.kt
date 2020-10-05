@@ -24,6 +24,7 @@ class EnumDataExtractor(private val elementAnalyzer: ElementAnalyzer) {
         val constantNames = element.enclosedElements
                 .filter { it.kind == ElementKind.ENUM_CONSTANT }
                 .map { it.simpleName.toString() }
+                .toSortedSet()
         val expressionName = nameOverride ?: "${enumName}Expression"
 
         return EnumData(pkg, enumName,  element.qualifiedName.toString(), expressionName, constantNames)
@@ -35,7 +36,7 @@ data class EnumData(
         val simpleName: String,
         val qualifiedName: String,
         val expressionName: String,
-        val symbols: List<String>
+        val symbols: Set<String>
 ) {
     val enumType: ClassName = ClassName.bestGuess(qualifiedName)
 }

@@ -28,8 +28,9 @@ class DataCollector(private val elementUtils: Elements, private val typeUtils: T
                 .toList()
 
         val groupBySupertype: Map<TypeElement, List<Step1>> = validHierarchies.groupBy(Step1::superType)
-        val hierarchies = groupBySupertype.map {
-            SealedHierarchy(it.key, it.value.map(Step1::type))
+        val hierarchies = groupBySupertype.map { entry ->
+            val sortedImplementations = entry.value.map(Step1::type).sortedBy { it.qualifiedName.toString() }
+            SealedHierarchy(entry.key, sortedImplementations)
         }
 
         val sealedPackages = getImplicitSealedPackages(groupBySupertype.keys)

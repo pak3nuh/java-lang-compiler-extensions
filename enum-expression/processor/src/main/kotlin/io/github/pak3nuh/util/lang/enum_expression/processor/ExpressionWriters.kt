@@ -8,7 +8,7 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeSpec
 import com.squareup.javapoet.TypeVariableName
-import java.util.*
+import java.util.Objects
 import java.util.function.Supplier
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Modifier
@@ -56,7 +56,7 @@ class ExpressionWriter(val filer: Filer) {
                 .build()
     }
 
-    private fun evaluatorCode(symbols: List<String>, symbolFn: (String) -> String): CodeBlock {
+    private fun evaluatorCode(symbols: Set<String>, symbolFn: (String) -> String): CodeBlock {
         val objectsClassName = ClassName.get(Objects::class.java)
         return CodeBlock.builder()
                 .beginControlFlow("switch(\$T.requireNonNull(value))", objectsClassName)
@@ -101,7 +101,7 @@ class ExpressionWriter(val filer: Filer) {
                 .build()
     }
 
-    private fun toParameters(symbols: List<String>, variableName: TypeVariableName, enumType: ClassName): Iterable<ParameterSpec> {
+    private fun toParameters(symbols: Set<String>, variableName: TypeVariableName, enumType: ClassName): Iterable<ParameterSpec> {
         val supplierType = ParameterizedTypeName.get(ClassName.get(Supplier::class.java), variableName)
         val enumParameter = ParameterSpec.builder(enumType, "value").build()
         return listOf(enumParameter) + symbols.map {
