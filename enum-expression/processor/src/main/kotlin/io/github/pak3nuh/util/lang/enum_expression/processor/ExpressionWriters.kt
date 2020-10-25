@@ -9,7 +9,7 @@ import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeSpec
 import com.squareup.javapoet.TypeVariableName
 import io.github.pak3nuh.util.processor.ExpressionBuilder
-import java.util.Objects
+import java.util.*
 import java.util.function.Supplier
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Modifier
@@ -21,10 +21,13 @@ class ExpressionWriter(private val filer: Filer) {
         val builder = TypeSpec.interfaceBuilder(exprInterfaceName)
                 .addModifiers(Modifier.PUBLIC)
                 .addTypeVariable(variableName)
-                .addType(defaultInterface(enumData, variableName, exprInterfaceName))
                 .addMethods(toInterfaceMethods(enumData, variableName))
                 .addMethod(evaluatorMethod(enumData, exprInterfaceName))
                 .addMethod(lambdaExhaustive(enumData))
+
+        if (enumData.defaultInterface) {
+            builder.addType(defaultInterface(enumData, variableName, exprInterfaceName))
+        }
 
         if (enumData.expressionBuilder) {
             val expressionBuilder = getExpressionBuilder(enumData)
@@ -40,7 +43,7 @@ class ExpressionWriter(private val filer: Filer) {
         val builder = ExpressionBuilder(enumData.enumType, enumData.pkg)
         val inputType = ParameterizedTypeName.get(ClassName.get(Supplier::class.java), TypeVariableName.get("T"))
         enumData.symbols.map {
-            builder.addBranch(it, inputType)
+            builder.addBranch("on$it", inputType)
         }
         return builder
     }

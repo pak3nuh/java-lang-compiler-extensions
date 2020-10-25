@@ -20,7 +20,17 @@ class EnumDataExtractor(private val elementAnalyzer: ElementAnalyzer) {
                 .toSortedSet()
         val expressionName = getNameOverride(type) ?: "${enumName}Expression"
 
-        return EnumData(pkg, enumName,  element.qualifiedName.toString(), expressionName, constantNames, getExpressionBuilder(type))
+        return EnumData(pkg, enumName,  element.qualifiedName.toString(), expressionName, constantNames,
+                getExpressionBuilder(type), getDefaultInterface(type))
+    }
+
+    private fun getDefaultInterface(type: ElementAnalyzer.Type): Boolean {
+        return type.annotations()
+                .filter { it.isA(Expression::class.java) }
+                .flatMap { it.values() }
+                .filter { it.name == Expression::defaultInterface.name }
+                .map { it.value as Boolean }
+                .first()
     }
 
     private fun getExpressionBuilder(type: ElementAnalyzer.Type): Boolean {
@@ -49,7 +59,8 @@ data class EnumData(
         val qualifiedName: String,
         val expressionName: String,
         val symbols: Set<String>,
-        val expressionBuilder: Boolean
+        val expressionBuilder: Boolean,
+        val defaultInterface: Boolean
 ) {
     val enumType: ClassName = ClassName.bestGuess(qualifiedName)
 }

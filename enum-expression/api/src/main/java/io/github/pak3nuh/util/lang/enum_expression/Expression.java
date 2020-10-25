@@ -19,7 +19,12 @@ public @interface Expression {
     String value() default "";
 
     /**
-     * <p>If true creates and expression builder with lambda support for cleaner code</p>
+     * <p>If true creates and expression builder with lambda support for cleaner code.</p>
      */
     boolean expressionBuilder() default false;
+
+    /**
+     * If true generates an interface that treats unhandled branches as defaults.
+     */
+    boolean defaultInterface() default false;
 }

@@ -29,7 +29,7 @@ class ExpressionBuilder(
         }
     }
 
-    val builderName = childClassName("ExpressionBuilder")
+    val builderName = childClassName("Builder")
 
     private fun getDefinitionsList(): List<Definition> = definitionList
             ?: createDefinitionList().also {
@@ -40,9 +40,9 @@ class ExpressionBuilder(
         val sortedDefinitions = map.entries.sortedBy { it.key }
                 .mapIndexed { idx, entry ->
                     val interfaceName = childClassName("Builder$idx")
-                    Definition(interfaceName, entry.key, entry.value)
+                    Definition(interfaceName, entry.key, entry.value, entry.key)
                 }
-                .plus(Definition(ClassName.get(packageElement, "Evaluator"), "evaluator", inputType))
+                .plus(Definition(ClassName.get(packageElement, "Evaluator"), "evaluate", inputType, "input"))
 
         sortedDefinitions.reduce { acc, definition ->
             acc.nextDefinition = definition
@@ -78,7 +78,7 @@ class ExpressionBuilder(
         val firstInterfaceName = getDefinitionsList().first().interfaceTypeName.simpleClassName()
         val returnType = ParameterizedTypeName.get(firstInterfaceName, methodVariable)
         return MethodSpec.methodBuilder("create")
-                .addModifiers(Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(returnType)
                 .addTypeVariable(methodVariable)
                 .addStatement("return new \$L()", builderName.simpleName())
@@ -92,13 +92,18 @@ class ExpressionBuilder(
         return MethodSpec.methodBuilder("evaluate")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(outputType)
-                .addStatement("return \$T.\$L(\$L, \$L)", expressionTypeName, methodName, inputDefinition.branchName, arguments)
+                .addStatement("return \$T.\$L(\$L, \$L)", expressionTypeName, methodName, inputDefinition.methodInputParamName, arguments)
                 .build()
     }
 
     private fun childClassName(simpleName: String) = ClassName.get(packageElement, simpleName)
 
-    private class Definition(val interfaceTypeName: ClassName, val branchName: String, val methodInput: TypeName) {
+    private class Definition(
+            val interfaceTypeName: ClassName,
+            val branchName: String,
+            val methodInput: TypeName,
+            val methodInputParamName: String
+    ) {
         var nextDefinition: Definition? = null
 
         fun nextReturnType(outputType: TypeName): TypeName {
@@ -120,7 +125,7 @@ class ExpressionBuilder(
 
         fun buildAbstractMethod(outputType: TypeName): MethodSpec {
             return MethodSpec.methodBuilder(branchName)
-                    .addParameter(methodInput, branchName)
+                    .addParameter(methodInput, methodInputParamName)
                     .addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
                     .returns(nextReturnType(outputType))
                     .build()
@@ -136,28 +141,30 @@ class ExpressionBuilder(
 
         private fun buildMethodImplIntermediate(outputType: TypeName): MethodSpec {
             return MethodSpec.methodBuilder(branchName)
-                    .addParameter(methodInput, branchName)
+                    .addParameter(methodInput, methodInputParamName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(nextReturnType(outputType))
                     .addAnnotation(Override::class.java)
-                    .addStatement("this.\$L = \$L", branchName, branchName)
+                    .addStatement("this.\$L = \$L", methodInputParamName, methodInputParamName)
                     .addStatement("return this")
                     .build()
         }
 
         private fun buildMethodImplFinal(outputType: TypeName): MethodSpec {
             return MethodSpec.methodBuilder(branchName)
-                    .addParameter(methodInput, branchName)
+                    .addParameter(methodInput, methodInputParamName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(nextReturnType(outputType))
                     .addAnnotation(Override::class.java)
-                    .addStatement("this.\$L = \$L", branchName, branchName)
+                    .addStatement("this.\$L = \$L", methodInputParamName, methodInputParamName)
                     .addStatement("return evaluate()")
                     .build()
         }
 
         fun buildField(): FieldSpec {
-            return FieldSpec.builder(methodInput, branchName).build()
+            return FieldSpec.builder(methodInput, methodInputParamName)
+                    .addModifiers(Modifier.PRIVATE)
+                    .build()
         }
     }
 

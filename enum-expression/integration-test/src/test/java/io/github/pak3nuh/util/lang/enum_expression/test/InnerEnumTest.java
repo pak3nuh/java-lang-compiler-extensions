@@ -28,11 +28,11 @@ class InnerEnumTest {
 
     @Test
     void shouldCreateBuilder() {
-        final Integer result = TypeExpression.ExpressionBuilder.<Integer>create()
-                .T1(() -> 1)
-                .T2(() -> 2)
-                .T3(() -> 3)
-                .evaluator(InnerEnum.Type.T3);
+        final Integer result = TypeExpression.Builder.<Integer>create()
+                .onT1(() -> 1)
+                .onT2(() -> 2)
+                .onT3(() -> 3)
+                .evaluate(InnerEnum.Type.T3);
         assertEquals(3, result);
     }
 }
