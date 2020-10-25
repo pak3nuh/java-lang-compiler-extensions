@@ -17,4 +17,9 @@ public @interface Expression {
      * <p>By default, the interface will have the same name as the enum with the <b>Expression</b> appended.</p>
      */
     String value() default "";
+
+    /**
+     * <p>If true creates and expression builder with lambda support for cleaner code</p>
+     */
+    boolean expressionBuilder() default false;
 }
