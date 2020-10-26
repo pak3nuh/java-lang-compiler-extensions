@@ -1,10 +1,11 @@
 # Sealed Classes
-Restricts the inheritance chain of a class hierarchy so that the full tree can be known at compile time.
-With the tree known at compile time, it can be possible to generate code that fully exhausts the
-inheritance chain possibilities and breaks compilation if a branch is missing.
+A sealed class hierarchy is an inheritance chain that is known at compile time so that the compiler
+can make validations like exhaustive expressions.
+This processor allows marking types as part of sealed hierarchies and generates exhaustive expression
+evaluators for annotated types.
 
 ## Example
-For a definition
+For a definition with a root type and two sealed children
 ```java
 public abstract class Person {
     Person(){}
@@ -66,9 +67,6 @@ of integrity on the generated code.
 1. Any class annotated with `SealedType` must extend from an *abstract* class with only 
 *package protected* or *private* constructors. The default constructor is not valid.
 2. Any class annotated with `SealedType` must be either *final* or *abstract*.
-
-These integrity checks, along with package sealing, ensure that the entire inheritance chain
-is known in a single compilation step, not being possible to extend it further.
 
 ## Usage
 

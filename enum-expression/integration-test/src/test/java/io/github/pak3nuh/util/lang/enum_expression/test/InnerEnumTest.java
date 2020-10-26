@@ -17,7 +17,22 @@ class InnerEnumTest {
             public Integer T2() {
                 return 2;
             }
+
+            @Override
+            public Integer T3() {
+                return 3;
+            }
         });
         assertEquals(2, eval);
+    }
+
+    @Test
+    void shouldCreateBuilder() {
+        final Integer result = TypeExpression.Builder.<Integer>create()
+                .onT1(() -> 1)
+                .onT2(() -> 2)
+                .onT3(() -> 3)
+                .evaluate(InnerEnum.Type.T3);
+        assertEquals(3, result);
     }
 }

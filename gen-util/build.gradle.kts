@@ -6,3 +6,7 @@ plugins {
     `maven-publish`
     signing
 }
+
+dependencies {
+    implementation(Dependencies.javaPoet)
+}

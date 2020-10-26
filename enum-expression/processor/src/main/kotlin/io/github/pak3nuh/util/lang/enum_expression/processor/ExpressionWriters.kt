@@ -8,25 +8,44 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeSpec
 import com.squareup.javapoet.TypeVariableName
-import java.util.Objects
+import io.github.pak3nuh.util.processor.ExpressionBuilder
+import java.util.*
 import java.util.function.Supplier
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Modifier
 
-class ExpressionWriter(val filer: Filer) {
+class ExpressionWriter(private val filer: Filer) {
     fun write(enumData: EnumData) {
         val exprInterfaceName: ClassName = ClassName.bestGuess("${enumData.pkg}.${enumData.expressionName}")
         val variableName: TypeVariableName = TypeVariableName.get("T")
-        val type = TypeSpec.interfaceBuilder(exprInterfaceName)
+        val builder = TypeSpec.interfaceBuilder(exprInterfaceName)
                 .addModifiers(Modifier.PUBLIC)
                 .addTypeVariable(variableName)
-                .addType(defaultInterface(enumData, variableName, exprInterfaceName))
                 .addMethods(toInterfaceMethods(enumData, variableName))
                 .addMethod(evaluatorMethod(enumData, exprInterfaceName))
                 .addMethod(lambdaExhaustive(enumData))
-                .build()
-        val file = JavaFile.builder(enumData.pkg, type).build()
+
+        if (enumData.defaultInterface) {
+            builder.addType(defaultInterface(enumData, variableName, exprInterfaceName))
+        }
+
+        if (enumData.expressionBuilder) {
+            val expressionBuilder = getExpressionBuilder(enumData)
+            builder.addTypes(expressionBuilder.buildInterfaces())
+            builder.addType(expressionBuilder.buildBuilder(exprInterfaceName, "evalLambda"))
+        }
+
+        val file = JavaFile.builder(enumData.pkg, builder.build()).build()
         file.writeTo(filer)
+    }
+
+    private fun getExpressionBuilder(enumData: EnumData): ExpressionBuilder {
+        val builder = ExpressionBuilder(enumData.enumType, enumData.pkg)
+        val inputType = ParameterizedTypeName.get(ClassName.get(Supplier::class.java), TypeVariableName.get("T"))
+        enumData.symbols.map {
+            builder.addBranch("on$it", inputType)
+        }
+        return builder
     }
 
     private fun defaultInterface(enumData: EnumData, variableName: TypeVariableName, exprInterfaceName: ClassName): TypeSpec {
