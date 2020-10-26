@@ -34,10 +34,10 @@ class NestedTest {
     @Test
     void shouldEvaluateLambda() {
         final Integer eval = NestedExpression.evalLambda(new OuterChild.Child1(),
-                (item) -> 1,
-                (item) -> 2,
-                (item) -> 3,
-                (item) -> 4
+                (Nested.Child1 item) -> 1,
+                (Nested.Child2 item) -> 2,
+                (OuterChild item) -> 3,
+                (OuterChild.Child1 item) -> 4
         );
         assertEquals(4, eval);
     }
