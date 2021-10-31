@@ -10,7 +10,7 @@ allprojects {
     group = Projects.baseGroupId
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -30,7 +30,8 @@ subprojects {
             }
         }
 
-        if (plugins.hasPlugin("maven-publish")) {
+        val publishingEnabled: Boolean? by project
+        if (publishingEnabled == true && plugins.hasPlugin("maven-publish")) {
             java {
                 withSourcesJar()
                 withJavadocJar()
