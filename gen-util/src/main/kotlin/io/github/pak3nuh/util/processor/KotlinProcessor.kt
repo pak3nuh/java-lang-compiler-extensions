@@ -15,13 +15,13 @@ abstract class KotlinProcessor(private val annotations: Set<KClass<out Annotatio
     private lateinit var filer: Filer
     protected lateinit var elementAnalyzer: ElementAnalyzer
 
-    override fun init(processingEnv: ProcessingEnvironment) {
+    final override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
         elementAnalyzer = ElementAnalyzer(processingEnv.elementUtils, processingEnv.typeUtils)
         filer = processingEnv.filer
     }
 
-    override fun getSupportedAnnotationTypes(): Set<String> = annotations.mapTo(HashSet()) {it.qualifiedName!!}
+    final override fun getSupportedAnnotationTypes(): Set<String> = annotations.mapTo(HashSet()) {it.qualifiedName!!}
 
     final override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
         val env = roundEnv!!
