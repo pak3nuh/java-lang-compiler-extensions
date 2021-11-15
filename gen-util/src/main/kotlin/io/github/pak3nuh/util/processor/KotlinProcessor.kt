@@ -1,7 +1,6 @@
 package io.github.pak3nuh.util.processor
 
 import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Filer
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -12,13 +11,11 @@ import kotlin.reflect.KClass
 
 abstract class KotlinProcessor(private val annotations: Set<KClass<out Annotation>>): AbstractProcessor() {
 
-    private lateinit var filer: Filer
     protected lateinit var elementAnalyzer: ElementAnalyzer
 
     final override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
         elementAnalyzer = ElementAnalyzer(processingEnv.elementUtils, processingEnv.typeUtils)
-        filer = processingEnv.filer
     }
 
     final override fun getSupportedAnnotationTypes(): Set<String> = annotations.mapTo(HashSet()) {it.qualifiedName!!}
@@ -31,12 +28,12 @@ abstract class KotlinProcessor(private val annotations: Set<KClass<out Annotatio
                 Pair(it, env.getElementsAnnotatedWith(it.java))
             }
             kProcessRound(byAnnotationList, env).forEach {
-                it.writeTo(filer)
+                it.writeTo(processingEnv.filer)
             }
             true
         } catch (ex: Exception) {
             ex.printStackTrace()
-            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "Error processing annotations: ${ex.message}")
+            logError("Error processing annotations: ${ex.message}")
             false
         }
     }
@@ -45,6 +42,10 @@ abstract class KotlinProcessor(private val annotations: Set<KClass<out Annotatio
 
     final override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.RELEASE_8
+    }
+
+    protected fun logError(message: String) {
+        processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, message)
     }
 
 }

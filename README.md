@@ -7,3 +7,5 @@ but some of them are really handy, these processors try to fill the gap using co
 [Enum Expression](./enum-expression/README.md)
 
 [Sealed classes](./sealed-classes/README.md)
+
+[Delegates](./delegates/README.md)

@@ -23,6 +23,7 @@ interface Named {
     String name();
 }
 
+@Delegate
 interface Greeter {
     String greet(String who);
 }
@@ -31,6 +32,27 @@ interface Greeter {
 The generator will create interfaces that implement all the boilerplate around the
 pattern, allowing users to use it just by implementing one method to switch the
 object it delegates to:
+```java
+// Generated
+interface NamedDelegate {
+    Named delegateTo(Named caller);
+
+    default String name() {
+        return delegateTo(this).name();
+    }
+}
+
+// Generated
+interface GreeterDelegate {
+    Greeter delegateTo(Greeter caller);
+
+    default String greet(String who) {
+        return delegateTo(this).greet(who);
+    }
+}
+```
+
+Users only need to implement the generated code.
 ```java
 class Person implements NamedDelegate, GreeterDelegate {
     @Override
@@ -48,14 +70,41 @@ class Person implements NamedDelegate, GreeterDelegate {
 A user may still override each method individually for additional customization, for instance
 auditing.
 
-## Interface extension
+### Interface extension
 
-Currently, only methods that are on the interface marked with `@Delegate` will be picked up
-on the code generator. This means that delegating a `Map<String,Integer>` is still not
-possible.
+The generator will stub every method in the inheritance chain that is marked as *abstract*, not
+only in the interface with the `@Delegate` annotation.
 
-This is a conscious decision for two main reasons:
-1. Doing it is not that trivial because of parameter reifications. I would need capture type variables
-and reify them based on the usage, which is not easy.
-2. I expect this to be a small use case since most of the code generation is done on
-code we control.
+## Bridges
+
+Another specialization of delegates is when they are used as *bridges*.
+
+Bridges allow a single implementor to respect multiple interfaces, acting as a middle man.
+
+The generator supports bridging by specifying the `bridge` parameter. 
+In this mode, the generated interface will contain multiple `delegateTo` methods, one for each interface to bridge.
+This is specially useful on object composition patterns.
+
+```java
+@Delegate(bridge = true)
+public interface Bird extends Flyer, Walker {}
+
+// Generated
+public interface BirdBridge extends Flyer, Walker {
+    Flyer delegateTo(Flyer caller);
+    Walker delegateTo(Walker caller);
+    // all other methods
+}
+```
+
+We can also use a bridge interface to delegate interfaces we don't control, for instance on the JDK.
+```java
+@Delegate(bridge = true)
+public interface MyMap<K, V> extends Map<K, V> {}
+
+// Generated
+public interface MyMapBridge<K, V> extends Map<K, V> {
+    Map<K, V> delegateTo(Map<K, V> caller);
+    // all other methods
+}
+```
