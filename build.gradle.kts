@@ -30,8 +30,8 @@ subprojects {
             }
         }
 
-        val publishingEnabled: Boolean? by project
-        if (publishingEnabled == true && plugins.hasPlugin("maven-publish")) {
+        val publishingEnabled: String? by project
+        if (publishingEnabled?.toBoolean() == true && plugins.hasPlugin("maven-publish")) {
             java {
                 withSourcesJar()
                 withJavadocJar()

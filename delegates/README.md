@@ -4,7 +4,7 @@ Annotation processor to generate interfaces that reduce boilerplate needed for t
 Delegate pattern.
 
 Delegates are very useful for implementing other patterns like `Proxy`, object composition
-or an approximation of `Mixins`.
+or bridging.
 
 ## Usage
 
@@ -30,8 +30,8 @@ interface Greeter {
 ```
 
 The generator will create interfaces that implement all the boilerplate around the
-pattern, allowing users to use it just by implementing one method to switch the
-object it delegates to:
+pattern, allowing users to use it just by implementing one method to provide the
+object it should delegate to:
 ```java
 // Generated
 interface NamedDelegate {
@@ -52,7 +52,7 @@ interface GreeterDelegate {
 }
 ```
 
-Users only need to implement the generated code.
+Users only need to implement the generated interfaces.
 ```java
 class Person implements NamedDelegate, GreeterDelegate {
     @Override
