@@ -6,11 +6,11 @@ plugins {
 }
 
 allprojects {
-    version = "0.2.0"
+    version = "0.3.0"
     group = Projects.baseGroupId
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -30,7 +30,8 @@ subprojects {
             }
         }
 
-        if (plugins.hasPlugin("maven-publish")) {
+        val publishingEnabled: String? by project
+        if (publishingEnabled?.toBoolean() == true && plugins.hasPlugin("maven-publish")) {
             java {
                 withSourcesJar()
                 withJavadocJar()

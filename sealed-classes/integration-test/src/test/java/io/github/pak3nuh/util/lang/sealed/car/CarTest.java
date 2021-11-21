@@ -99,4 +99,14 @@ class CarTest {
         });
         assertTrue(result);
     }
+
+    @Test
+    void shouldEvaluateLambda() {
+        int result = CarExpression.evalLambda(new BmwI8(),
+                (Bmw bmw) -> 0,
+                (Fiat fiat) -> 1,
+                (Nissan nissan) -> 2
+        );
+        assertEquals(0, result);
+    }
 }
